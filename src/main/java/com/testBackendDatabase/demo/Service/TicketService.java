@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -56,6 +57,7 @@ public class TicketService {
     @Transactional
     public List<TicketDTO> BookTicket(TicketBookingRequest request)
     {
+        try{
        
        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
        
@@ -64,7 +66,7 @@ public class TicketService {
 
        Account account = accountRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
-       ShowTime showTime = showTimeRepository.findById(request.getShowtimeId())
+       ShowTime showTime = showTimeRepository.findActiveByIdWithMovieAndRoom(request.getShowtimeId(),LocalDateTime.now())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suất chiếu không tồn tại"));
 
        List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
@@ -72,10 +74,10 @@ public class TicketService {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Một số ghế không tồn tại");
     }
 
-    for (Seat seat : seats) {
-        if (ticketRepository.existsByShowTimeAndSeat(showTime, seat)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ghế " + seat.getName() + " đã có người đặt!");
-        }
+    List<Long> TicketsInDatabase= ticketRepository.findBookedSeatIds(showTime.getId(), request.getSeatIds());
+    if(!TicketsInDatabase.isEmpty())
+    {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"CO mot so ghe da dat");
     }
 
     double totalAmount = 0;
@@ -87,9 +89,10 @@ public class TicketService {
         }
         totalAmount += price;
     }
+    totalAmount=0;//TEst
 
     if (account.getBalance() < totalAmount) {
-        throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Số dư không đủ để thực hiện giao dịch");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số dư không đủ để thực hiện giao dịch");
     }
 
     // 6. Trừ tiền tài khoản
@@ -139,6 +142,13 @@ public class TicketService {
             .startTime(ticket.getShowTime().getStartTime())
             .build()
 ).collect(Collectors.toList());
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            throw e;
+        }
+
 
 
     

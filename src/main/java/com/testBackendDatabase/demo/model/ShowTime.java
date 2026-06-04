@@ -27,6 +27,8 @@ public class ShowTime {
     
     @Builder.Default // Giúp giá trị mặc định hoạt động khi dùng @Builder
     private Boolean isFull = false;
+    @Builder.Default
+    private Boolean isActive=true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id", nullable = false)

@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,11 +32,12 @@ public class Ticket {
     private Long id;
 
     // Mã định danh duy nhất để tạo mã QR (ví dụ: "A1B2-C3D4-E5F6")
-    @Column(unique = true, nullable = false)
-    private String qrCode;
-
+   @Column(unique = true, nullable = false, length = 100) 
     private String ticketCode;
 
+    // Chuỗi Base64 rất dài của ảnh QR - ĐỂ LONGTEXT Ở ĐÂY VÀ BỎ UNIQUE ĐI
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String qrCode;
     // Trạng thái quét vé
     @Builder.Default
     private boolean isUsed = false;

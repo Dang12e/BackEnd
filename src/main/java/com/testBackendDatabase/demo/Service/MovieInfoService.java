@@ -1,6 +1,7 @@
 package com.testBackendDatabase.demo.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ private CloudinaryService cloudinaryService;
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));
         
         // 2. Lấy dữ liệu và map sang DTO
-        return showTimeRepository.findByMovie(movie).stream()
+        return showTimeRepository.findActiveByMovie(movie,LocalDateTime.now()).stream()
                 .map(st -> {
                     ShowTimeDTO dto = new ShowTimeDTO();
                     dto.setId(st.getId());

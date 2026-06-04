@@ -25,4 +25,7 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
        "WHERE a.id = :accountId") // Sử dụng alias.id
 List<Ticket> findAllByAccountId(@Param("accountId") Long accountId);
 
+@Query("SELECT t.seat.id FROM Ticket t WHERE t.showTime.id = :showTimeId AND t.seat.id IN :seatIds")
+List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatIds") List<Long> seatIds);
+
 }
