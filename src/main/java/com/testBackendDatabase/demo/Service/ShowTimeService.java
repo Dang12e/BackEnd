@@ -1,5 +1,6 @@
 package com.testBackendDatabase.demo.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class ShowTimeService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));
     
     // 2. Lấy suất chiếu và map thẳng địa chỉ vào DTO
-    List<ShowTimeDTO> result = showTimeRepository.findByMovie(movie).stream()
+    List<ShowTimeDTO> result = showTimeRepository.findActiveByMovie(movie,LocalDateTime.now()).stream()
             .map(st -> {
                 ShowTimeDTO dto = new ShowTimeDTO();
                 dto.setId(st.getId());
