@@ -64,8 +64,7 @@ bin/
 out/
 
 # Loại bỏ các file cấu hình nhạy cảm (nếu có)
-src/main/resources/application.properties
-src/main/resources/application-dev.yml
+
 
 # Hệ điều hành
 .DS_Store
