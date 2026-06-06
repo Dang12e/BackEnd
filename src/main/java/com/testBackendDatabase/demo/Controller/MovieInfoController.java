@@ -2,6 +2,7 @@ package com.testBackendDatabase.demo.Controller;
 
 import java.util.List;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,9 +40,9 @@ public class MovieInfoController {
         this.movieInfoService=movieInfoService;
     }
 
-    @PostMapping("/getMovieDtail")
-    public ResponseEntity<List<ShowTimeDTO>> getShowTimes(@RequestBody ShowTimeRequest request) {
-        List<ShowTimeDTO> showtimes= movieInfoService.getShowTimesByMovie(request.getId());
+    @GetMapping("/getShowTimes")
+    public ResponseEntity<List<ShowTimeDTO>> getShowTimes(@RequestParam Long movieID) {
+        List<ShowTimeDTO> showtimes= movieInfoService.getShowTimesByMovie(movieID);
         return ResponseEntity.ok(showtimes);
     }
 
