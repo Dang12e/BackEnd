@@ -3,6 +3,7 @@ package com.testBackendDatabase.demo.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.testBackendDatabase.demo.DTO.BasicTicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketForUserDTO;
 import com.testBackendDatabase.demo.Request.TicketBookingRequest;
@@ -14,11 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
 @RestController
-@RequestMapping("api/Ticket")
+@RequestMapping("/api/Ticket")
 public class TicketController {
 
     private final TicketService ticketService;
@@ -41,6 +44,19 @@ public class TicketController {
        return ResponseEntity.ok(ticketDTOs);
 
     }
+    @GetMapping("/getUsersTickets")
+    public ResponseEntity<List<BasicTicketDTO>> getUsersTickets() {
+        List<BasicTicketDTO> basicTicketDTOs=ticketService.getUsersTickets();
+        return ResponseEntity.ok(basicTicketDTOs);
+        
+    }
+    @GetMapping("/getTicketDetail")
+    public ResponseEntity<TicketDTO> getTicketDetail(@RequestParam String ticketCode) {
+        TicketDTO ticketDTO=ticketService.getTicketDetail(ticketCode);
+        return ResponseEntity.ok(ticketDTO);
+    }
+    
+    
     
     
     

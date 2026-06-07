@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.testBackendDatabase.demo.DTO.BasicTicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketForUserDTO;
 import com.testBackendDatabase.demo.Repository.AccountRepository;
@@ -174,4 +175,52 @@ public List<TicketForUserDTO> getTickets()
         .ticketCode(t.getTicketCode()).build()
     ).collect(Collectors.toList());
 }
+@Transactional(readOnly=true)
+public List<BasicTicketDTO> getUsersTickets()
+{
+     Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    Account account=accountRepository.findByUsername(username).orElseThrow(
+        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,"khong tim thay tai khoan")
+    );
+    List<Ticket> tickets= ticketRepository.findAllByAccountId(account.getId());
+    return tickets.stream().map(t->
+       BasicTicketDTO.builder().bookingTime(t.getBookingTime())
+       .customerName(username)
+       .movieTitle(t.getShowTime().getMovie().getTitle())
+       .price(t.getPrice())
+       .roomName(t.getShowTime().getShowRoom().getRoomName())
+       .seatName(t.getSeat().getName())
+       .seatType(t.getSeat().getType())
+       .startTime(t.getShowTime().getStartTime())
+       .ticketCode(t.getTicketCode())
+       .build()
+    ).toList();
+}
+@Transactional(readOnly = true)
+public TicketDTO getTicketDetail(String TicketCode)
+{
+    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+    String username = authentication.getName();
+    Account account=accountRepository.findByUsername(username).orElseThrow(
+        ()->new ResponseStatusException(HttpStatus.NOT_FOUND,"khong tim thay tai khoan")
+    );
+    Ticket ticket=ticketRepository.findByAccountAndTicketCodeFetchJoin(account.getId(), TicketCode).orElseThrow(
+        ()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Ticket code bi loi hoac khong ton tai")
+    );
+    return TicketDTO.builder().bookingTime(ticket.getBookingTime())
+    .customerName(account.getUsername())
+    .id(ticket.getId())
+    .movieTitle(ticket.getShowTime().getMovie().getTitle())
+    .price(ticket.getPrice())
+    .qrCodeBase64(ticket.getQrCode())
+    .roomName(ticket.getShowTime().getShowRoom().getRoomName())
+    .seatName(ticket.getSeat().getName())
+    .seatType(ticket.getSeat().getType())
+    .startTime(ticket.getShowTime().getStartTime())
+    .ticketCode(ticket.getTicketCode())
+    .build();
+
+}
+
 }

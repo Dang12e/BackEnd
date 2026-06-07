@@ -1,6 +1,7 @@
 package com.testBackendDatabase.demo.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,6 +25,16 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
        "JOIN FETCH t.seat " +
        "WHERE a.id = :accountId") // Sử dụng alias.id
 List<Ticket> findAllByAccountId(@Param("accountId") Long accountId);
+
+@Query("SELECT t FROM Ticket t " +
+       "JOIN FETCH t.account a " + // Đặt alias 'a' cho account
+       "JOIN FETCH t.showTime st " +
+       "JOIN FETCH st.movie " +
+       "JOIN FETCH st.showRoom " +
+       "JOIN FETCH t.seat " +
+       "WHERE a.id = :accountId and t.ticketCode= :tCode"
+)
+Optional<Ticket> findByAccountAndTicketCodeFetchJoin(@Param("accountId") Long accountId,@Param("tCode") String tCode);
 
 @Query("SELECT t.seat.id FROM Ticket t WHERE t.showTime.id = :showTimeId AND t.seat.id IN :seatIds")
 List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatIds") List<Long> seatIds);

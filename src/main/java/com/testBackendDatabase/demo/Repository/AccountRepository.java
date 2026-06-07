@@ -12,6 +12,7 @@ import com.testBackendDatabase.demo.model.Account;
 public interface AccountRepository extends JpaRepository<Account,Long> {
 
     Optional<Account> findByUsername(String username);
+    
 }
     
     

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("api/feature")
+@RequestMapping("/api/feature")
 public class ShowTimeController {
 
 

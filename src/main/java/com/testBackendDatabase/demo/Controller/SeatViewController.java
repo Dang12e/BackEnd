@@ -15,7 +15,7 @@ import com.testBackendDatabase.demo.Service.SeatViewService;
 
 
 @RestController
-@RequestMapping("api/feature")
+@RequestMapping("/api/feature")
 public class SeatViewController {
     private SeatViewService seatViewService;
 
