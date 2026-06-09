@@ -11,6 +11,7 @@ import com.testBackendDatabase.demo.Service.TicketService;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +55,11 @@ public class TicketController {
     public ResponseEntity<TicketDTO> getTicketDetail(@RequestParam String ticketCode) {
         TicketDTO ticketDTO=ticketService.getTicketDetail(ticketCode);
         return ResponseEntity.ok(ticketDTO);
+    }
+    
+    @GetMapping("/getUsersTicketPage")
+    public Page<BasicTicketDTO> getUsersTicketPage(@RequestParam int page) {
+        return ticketService.getTicketsWithPageForUser(page);
     }
     
     

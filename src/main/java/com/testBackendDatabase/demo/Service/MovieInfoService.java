@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,8 @@ private MovieInfoRepository movieInfoRepository;
 private ShowTimeRepository showTimeRepository;
 @Autowired
 private CloudinaryService cloudinaryService;
+
+private final int pageSize=15;
 
 @Transactional(readOnly = true) // Tối ưu hiệu năng vì chỉ đọc dữ liệu
     public List<ShowTimeDTO> getShowTimesByMovie(Long movieId) {
@@ -112,5 +117,32 @@ private CloudinaryService cloudinaryService;
         ).collect(Collectors.toList());
 
     }
-    
+    @Transactional(readOnly = true)
+    public Page<MovieDTO> getAllMovieWithPage(int page)
+    {
+        Pageable pageable=PageRequest.of(page, pageSize);
+        Page<MovieInfo> result=movieInfoRepository.findAll(pageable);
+        
+        return result.map(movieInfo->
+            MovieDTO.builder().genre(movieInfo.getGenre())
+            .id(movieInfo.getId())
+            .image(movieInfo.getImage())
+            .releaseDate(movieInfo.getReleaseDate())
+            .title(movieInfo.getTitle()).build()
+        ); 
+        
+    }
+    @Transactional(readOnly = true)
+    public Page<MovieDTO> getSearchMovieResultPage(int page,String key)
+    {
+        Pageable pageable= PageRequest.of(page, pageSize);
+        Page<MovieInfo> result= movieInfoRepository.findByTitleContaining(key, pageable);
+        return result.map(movieInfo->
+            MovieDTO.builder().genre(movieInfo.getGenre())
+            .id(movieInfo.getId())
+            .image(movieInfo.getImage())
+            .releaseDate(movieInfo.getReleaseDate())
+            .title(movieInfo.getTitle()).build()
+        );
+    }
 }

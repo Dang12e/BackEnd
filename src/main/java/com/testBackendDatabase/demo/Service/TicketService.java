@@ -9,6 +9,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
@@ -35,7 +38,7 @@ import com.testBackendDatabase.demo.model.WalletTransaction;
 
 @Service
 public class TicketService {
-    
+    private final int sizePage=10;
     @Autowired
     private AccountRepository accountRepository;
 
@@ -222,5 +225,26 @@ public TicketDTO getTicketDetail(String TicketCode)
     .build();
 
 }
-
+@Transactional(readOnly = true)
+public Page<BasicTicketDTO> getTicketsWithPageForUser(int page)
+{
+    Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+    String name = authentication.getName();
+    Account account= accountRepository.findByUsername(name).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"không tìm thấy tên người dùng"));
+    Pageable pageable= PageRequest.of(page,sizePage);
+    Page<Ticket> result= ticketRepository.findByAccountId(account.getId(), pageable);
+    return result.map(ticket->
+        BasicTicketDTO.builder().bookingTime(ticket.getBookingTime())
+        .customerName(name)
+        .movieTitle(ticket.getShowTime().getMovie().getTitle())
+        .price(ticket.getPrice())
+        .roomName(ticket.getShowTime().getShowRoom().getRoomName())
+        .seatName(ticket.getSeat().getName())
+        .seatType(ticket.getSeat().getType())
+        .startTime(ticket.getShowTime().getStartTime())
+        .ticketCode(ticket.getTicketCode())
+        .build()
+        
+    );
+}
 }

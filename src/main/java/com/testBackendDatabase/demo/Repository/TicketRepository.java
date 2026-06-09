@@ -3,6 +3,9 @@ package com.testBackendDatabase.demo.Repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -38,5 +41,13 @@ Optional<Ticket> findByAccountAndTicketCodeFetchJoin(@Param("accountId") Long ac
 
 @Query("SELECT t.seat.id FROM Ticket t WHERE t.showTime.id = :showTimeId AND t.seat.id IN :seatIds")
 List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatIds") List<Long> seatIds);
+
+@EntityGraph(attributePaths = {
+        "showTime", 
+        "showTime.movie", 
+        "showTime.showRoom", 
+        "seat"
+    })
+    Page<Ticket> findByAccountId(Long accountId, Pageable pageable);
 
 }

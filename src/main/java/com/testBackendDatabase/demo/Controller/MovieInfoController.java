@@ -2,6 +2,7 @@ package com.testBackendDatabase.demo.Controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,6 +65,16 @@ public class MovieInfoController {
         List<MovieDTO> movieDTOs= movieInfoService.getMovies();
         return ResponseEntity.ok(movieDTOs);
     }
+    @GetMapping("/getMoviesWithPage")
+    public Page<MovieDTO> getMoviesWithPage(@RequestParam int page) {
+        return movieInfoService.getAllMovieWithPage(page);
+    }
+    @GetMapping("/getSearchResultWithPage")
+    public Page<MovieDTO> getMethodName(@RequestParam int page,@RequestParam String key) {
+        return movieInfoService.getSearchMovieResultPage(page, key);
+    }
+    
+    
     
     
     
