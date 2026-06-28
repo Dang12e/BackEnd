@@ -1,19 +1,16 @@
 package com.testBackendDatabase.demo.Service;
 
-import com.testBackendDatabase.demo.Repository.WalletTransactionRepository;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,57 +25,56 @@ import com.testBackendDatabase.demo.Repository.AccountRepository;
 import com.testBackendDatabase.demo.Repository.SeatRepository;
 import com.testBackendDatabase.demo.Repository.ShowTimeRepository;
 import com.testBackendDatabase.demo.Repository.TicketRepository;
-import com.testBackendDatabase.demo.Request.TicketBookingRequest;
 import com.testBackendDatabase.demo.model.Account;
 import com.testBackendDatabase.demo.model.Seat;
 import com.testBackendDatabase.demo.model.ShowTime;
 import com.testBackendDatabase.demo.model.Ticket;
-import com.testBackendDatabase.demo.model.WalletTransaction;
 
 
 @Service
 public class TicketService {
-    private final int sizePage=10;
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private TicketRepository ticketRepository;
+    private final int sizePage = 10;
+    
+    // Tất cả các Repository và Service giờ đều là final
+    private final AccountRepository accountRepository;
+    private final TicketRepository ticketRepository;
+    private final SeatRepository seatRepository;
+    private final ShowTimeRepository showTimeRepository;
+    private final QRCodeService qrCodeService;
 
     
-    @Autowired
-    private SeatRepository seatRepository;
-
-    @Autowired ShowTimeRepository showTimeRepository;
-
-    @Autowired
-    private WalletTransactionRepository walletTransactionRepository;
-    @Autowired 
-    private QRCodeService qrCodeService;
-
+    public TicketService(
+            AccountRepository accountRepository,
+            TicketRepository ticketRepository,
+            SeatRepository seatRepository,
+            ShowTimeRepository showTimeRepository,
+            QRCodeService qrCodeService) {
+        this.accountRepository = accountRepository;
+        this.ticketRepository = ticketRepository;
+        this.seatRepository = seatRepository;
+        this.showTimeRepository = showTimeRepository;
+        this.qrCodeService = qrCodeService;
+    }
     
 
     @Transactional
-    public List<TicketDTO> BookTicket(TicketBookingRequest request)
+    public Long BookTicket(@NonNull List<Long> seatIDs, Long showTimeID, Account account)
     {
         try{
        
-       Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
-       
+       if (account == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Tài khoản không hợp lệ");
+       }
 
-       String username = authentication.getName();
-
-       Account account = accountRepository.findByUsername(username).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
-
-       ShowTime showTime = showTimeRepository.findActiveByIdWithMovieAndRoom(request.getShowtimeId(),LocalDateTime.now())
+       ShowTime showTime = showTimeRepository.findActiveByIdWithMovieAndRoom(showTimeID,LocalDateTime.now())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suất chiếu không tồn tại"));
 
-       List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
-       if (seats.size() != request.getSeatIds().size()) {
+       List<Seat> seats = seatRepository.findAllById(seatIDs);
+       if (seats.size() != seatIDs.size()) {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Một số ghế không tồn tại");
     }
 
-    List<Long> TicketsInDatabase= ticketRepository.findBookedSeatIds(showTime.getId(), request.getSeatIds());
+    List<Long> TicketsInDatabase= ticketRepository.findBookedSeatIds(showTime.getId(), seatIDs);
     if(!TicketsInDatabase.isEmpty())
     {
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"CO mot so ghe da dat");
@@ -93,15 +89,7 @@ public class TicketService {
         }
         totalAmount += price;
     }
-    totalAmount=0;//TEst
-
-    if (account.getBalance() < totalAmount) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số dư không đủ để thực hiện giao dịch");
-    }
-
-    // 6. Trừ tiền tài khoản
-    account.setBalance(account.getBalance() - totalAmount);
-    accountRepository.save(account);
+    
 
     List<Ticket> tickets = new ArrayList<>();
     for (Seat seat : seats) {
@@ -120,32 +108,9 @@ public class TicketService {
     }
     ticketRepository.saveAll(tickets);
 
-    // 8. Lưu lịch sử giao dịch (One-to-Many với Account)
-    WalletTransaction history = WalletTransaction.builder()
-            .amount(totalAmount)
-            .type("BOOKING_TICKET")
-            .description("Đặt vé suất chiếu: " + showTime.getId())
-            .transactionTime(LocalDateTime.now())
-            .account(account) // Thiết lập quan hệ
-            .build();
-    walletTransactionRepository.save(history);
 
-    // 9. Trả về DTO (Bạn có thể map tickets sang TicketDTO)
-   return tickets.stream().map(ticket -> 
-    TicketDTO.builder()
-            .bookingTime(ticket.getBookingTime())
-            .customerName(username)
-            .id(ticket.getId())
-            .movieTitle(ticket.getShowTime().getMovie().getTitle())
-            .price(ticket.getPrice())
-            .ticketCode(ticket.getTicketCode())
-            .qrCodeBase64(ticket.getQrCode())
-            .roomName(ticket.getShowTime().getShowRoom().getRoomName())
-            .seatName(ticket.getSeat().getName())
-            .seatType(ticket.getSeat().getType())
-            .startTime(ticket.getShowTime().getStartTime())
-            .build()
-).collect(Collectors.toList());
+     return (long)totalAmount;
+  
         }
         catch(Exception e)
         {
@@ -238,7 +203,7 @@ public Page<BasicTicketDTO> getTicketsWithPageForUser(int page)
         .customerName(name)
         .movieTitle(ticket.getShowTime().getMovie().getTitle())
         .price(ticket.getPrice())
-        .roomName(ticket.getShowTime().getShowRoom().getRoomName())
+        .roomName(ticket.getShowTime().getShowRoom().getRoomName()+", "+ticket.getShowTime().getShowRoom().getCinema().getName() +", "+ticket.getShowTime().getShowRoom().getCinema().getAddress())
         .seatName(ticket.getSeat().getName())
         .seatType(ticket.getSeat().getType())
         .startTime(ticket.getShowTime().getStartTime())

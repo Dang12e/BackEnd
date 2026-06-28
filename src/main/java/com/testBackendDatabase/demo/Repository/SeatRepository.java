@@ -8,5 +8,6 @@ import com.testBackendDatabase.demo.model.Seat;
 public interface SeatRepository extends JpaRepository<Seat,Long> {
 
     //Optional<Seat> findByShowTime(ShowTime showTime);
+   
     
 }

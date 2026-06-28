@@ -3,7 +3,6 @@ package com.testBackendDatabase.demo.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,16 +19,23 @@ import com.testBackendDatabase.demo.model.ShowRoom;
 
 @Service
 public class AddShowRoomService {
-    @Autowired
-    private ShowRoomRepository showRoomRepository;
-    @Autowired 
-    private SeatRepository seatRepository;
-    @Autowired
-    private CinemaRepository cinemaRepository;
+    private final ShowRoomRepository showRoomRepository;
+    private final SeatRepository seatRepository;
+    private final CinemaRepository cinemaRepository;
+
+    AddShowRoomService(ShowRoomRepository showRoomRepository, SeatRepository seatRepository, CinemaRepository cinemaRepository) {
+        this.showRoomRepository = showRoomRepository;
+        this.seatRepository = seatRepository;
+        this.cinemaRepository = cinemaRepository;
+    }
 
     @Transactional
+    @SuppressWarnings("null")
     public ShowRoomDTO addShowRoom(AddShowRoomRequest request)
     {
+        if (request == null || request.getCinemaID() == null) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID Rạp chiếu không được để trống!");
+    }
         Cinema cinema= cinemaRepository.findById(request.getCinemaID()).orElseThrow(
             ()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Rạp chiếu không tồn tại!")
         );
@@ -52,7 +58,7 @@ public class AddShowRoomService {
                 .colNum(colIndex)       // Lưu kiểu int
                 .name(seatName)      // Tên ghế kiểu String (A0, A1...)
                 .type(type)
-                .basePrice(50.0)
+                .basePrice(50000.0)
                 .showRoom(savedRoom)
                 .build();
         

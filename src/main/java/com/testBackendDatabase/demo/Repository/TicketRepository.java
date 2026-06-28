@@ -46,7 +46,8 @@ List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatI
         "showTime", 
         "showTime.movie", 
         "showTime.showRoom", 
-        "seat"
+        "seat",
+        "showTime.showRoom.cinema"
     })
     Page<Ticket> findByAccountId(Long accountId, Pageable pageable);
 

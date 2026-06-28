@@ -1,5 +1,4 @@
 package com.testBackendDatabase.demo.VNPAY;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
@@ -9,9 +8,13 @@ import java.util.*;
 
 @Service
 public class PaymentService {
-    @Autowired private VNPAYConfig vnpayConfig;
+    private final VNPAYConfig vnpayConfig;
 
-    public String createPaymentUrl(long amount, String orderInfo, HttpServletRequest request) {
+    PaymentService(VNPAYConfig vnpayConfig) {
+        this.vnpayConfig = vnpayConfig;
+    }
+
+    public String createPaymentUrl(long amount, String orderInfo,String vnp_TxnRef, HttpServletRequest request) {
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnpayConfig.vnp_Version);
         vnp_Params.put("vnp_Command", vnpayConfig.vnp_Command);
@@ -20,7 +23,7 @@ public class PaymentService {
         // VNPAY quy định số tiền nhân thêm 100 (Ví dụ: 10,000 VND phải gửi là 1000000)
         vnp_Params.put("vnp_Amount", String.valueOf(amount * 100)); 
         vnp_Params.put("vnp_CurrCode", "VND");
-        vnp_Params.put("vnp_TxnRef", String.valueOf(System.currentTimeMillis())); // Mã giao dịch duy nhất
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef); // Mã giao dịch duy nhất
         vnp_Params.put("vnp_OrderInfo", orderInfo);
         vnp_Params.put("vnp_OrderType", "other");
         vnp_Params.put("vnp_Locale", "vn");

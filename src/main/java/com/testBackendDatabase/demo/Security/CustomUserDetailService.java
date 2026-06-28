@@ -1,6 +1,5 @@
 package com.testBackendDatabase.demo.Security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,8 +10,11 @@ import com.testBackendDatabase.demo.model.Account;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService{
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+
+    CustomUserDetailService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

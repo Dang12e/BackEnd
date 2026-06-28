@@ -2,10 +2,11 @@ package com.testBackendDatabase.demo.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,15 +25,19 @@ import com.testBackendDatabase.demo.model.ShowTime;
 @Service
 public class ShowTimeService {
     
-    @Autowired
-    private ShowTimeRepository showTimeRepository;
-    @Autowired
-    private ShowRoomRepository showRoomRepository;
-    @Autowired
-    private MovieInfoRepository movieInfoRepository;
+    private final ShowTimeRepository showTimeRepository;
+    private final ShowRoomRepository showRoomRepository;
+    private final MovieInfoRepository movieInfoRepository;
+
+     ShowTimeService(MovieInfoRepository movieInfoRepository, ShowRoomRepository showRoomRepository, ShowTimeRepository showTimeRepository) {
+          this.movieInfoRepository = movieInfoRepository;
+          this.showRoomRepository = showRoomRepository;
+          this.showTimeRepository = showTimeRepository;
+     }
 
     @Transactional
-    public AddShowTimeDTO addShowTime(AddShowTimeRequest request)
+    @SuppressWarnings("null")
+    public AddShowTimeDTO addShowTime(@NonNull AddShowTimeRequest request)
     {
       MovieInfo movieInfo = movieInfoRepository.findById(request.getMovieID()).orElseThrow(
         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phim!")
@@ -41,9 +46,9 @@ public class ShowTimeService {
       ShowRoom showRoom = showRoomRepository.findById(request.getShowRoomID()).orElseThrow(
         ()-> new ResponseStatusException(HttpStatus.NOT_FOUND,"Không tìm thấy phòng chiếu")
       );
-      ShowTime showTime= ShowTime.builder().endTime(request.getEndTime()).
+      ShowTime showTime= Objects.requireNonNull(ShowTime.builder().endTime(request.getEndTime()).
       startTime(request.getStartTime()).movie(movieInfo).showRoom(showRoom)
-      .price(request.getPrice()).build();
+      .price(request.getPrice()).build());
       ShowTime savedShowTime=showTimeRepository.save(showTime);
       
       return AddShowTimeDTO.builder().endTime(savedShowTime.getEndTime())
@@ -56,7 +61,8 @@ public class ShowTimeService {
 
     }
     @Transactional(readOnly=true)
-    public List<ShowTimeDTO> getShowTimes(ShowTimeRequest request)
+    @SuppressWarnings("null")
+    public List<ShowTimeDTO> getShowTimes(@NonNull ShowTimeRequest request)
     {
         MovieInfo movie = movieInfoRepository.findById(request.getId())
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));

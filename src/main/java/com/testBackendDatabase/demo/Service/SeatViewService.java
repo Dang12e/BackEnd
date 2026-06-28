@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,12 +18,16 @@ import com.testBackendDatabase.demo.model.ShowTime;
 @Service
 public class SeatViewService {
 
-    @Autowired 
-    private ShowTimeRepository showTimeRepository;
+    private final ShowTimeRepository showTimeRepository;
+
+
+   SeatViewService(ShowTimeRepository showTimeRepository) {
+      this.showTimeRepository = showTimeRepository;
+   }
 
     
     @Transactional(readOnly=true)
-    public List<SeatDTO> getSeatView(Long showtimeID) {
+    public List<SeatDTO> getSeatView(@NonNull Long showtimeID) {
     // 1. Tìm suất chiếu (Nên đổi thông báo thành "Suất chiếu không tồn tại")
     ShowTime showTime = showTimeRepository.findById(showtimeID)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suất chiếu không tồn tại!"));

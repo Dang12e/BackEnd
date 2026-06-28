@@ -5,16 +5,15 @@ import org.springframework.context.annotation.Configuration;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 @Configuration
 public class VNPAYConfig {
-    @Value("${vnpay.url}") public String vnp_Url;
-    @Value("${vnpay.tmn-code}") public String vnp_TmnCode;
-    @Value("${vnpay.secret-key}") public String vnp_HashSecret;
-    @Value("${vnpay.version}") public String vnp_Version;
-    @Value("${vnpay.command}") public String vnp_Command;
-    @Value("${vnpay.return-url}") public String vnp_ReturnUrl;
+    @Value("${vnp.payUrl}") public String vnp_Url;
+    @Value("${vnp.tmnCode}") public String vnp_TmnCode;
+    @Value("${vnp.hashSecret}") public String vnp_HashSecret;
+    @Value("${vnp.version}") public String vnp_Version;
+    @Value("${vnp.command}") public String vnp_Command;
+    @Value("${vnp.returnUrl}") public String vnp_ReturnUrl;
 
     public String hmacSHA512(final String key, final String data) {
         try {

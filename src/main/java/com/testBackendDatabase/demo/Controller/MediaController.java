@@ -1,6 +1,6 @@
 package com.testBackendDatabase.demo.Controller;
 
-import com.testBackendDatabase.demo.CloudinaryConfig.*;
+import com.testBackendDatabase.demo.CloudinaryConfig.CloudinaryService;
 import com.testBackendDatabase.demo.DTO.CinemaDTO;
 import com.testBackendDatabase.demo.DTO.ShowRoomDTO;
 import com.testBackendDatabase.demo.Request.AddCinemaRequest;
@@ -10,26 +10,26 @@ import com.testBackendDatabase.demo.Service.AddShowRoomService;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
 @RequestMapping("/api/media")
 public class MediaController {
 
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    private final CloudinaryService cloudinaryService;
 
-    @Autowired 
-    private AddCinemaService addCinemaService;
-    @Autowired
-    private AddShowRoomService addShowRoomService;
+    private final AddCinemaService addCinemaService;
+    private final AddShowRoomService addShowRoomService;
+
+    MediaController(CloudinaryService cloudinaryService, AddCinemaService addCinemaService, AddShowRoomService addShowRoomService) {
+        this.cloudinaryService = cloudinaryService;
+        this.addCinemaService = addCinemaService;
+        this.addShowRoomService = addShowRoomService;
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
@@ -47,7 +47,7 @@ public class MediaController {
 
     @PostMapping("/addCinema")
     public ResponseEntity<CinemaDTO> addCinema(@Valid @RequestBody AddCinemaRequest request) {
-        //TODO: process POST request
+        
         
         CinemaDTO cinemaDTO =addCinemaService.addCinemaDTO(request);
         return ResponseEntity.ok(cinemaDTO);
@@ -55,7 +55,7 @@ public class MediaController {
 
     @PostMapping("addShowRoom")
     public ResponseEntity<ShowRoomDTO> postMethodName(@Valid @RequestBody AddShowRoomRequest request) {
-        //TODO: process POST request
+    
         ShowRoomDTO showRoomDTO= addShowRoomService.addShowRoom(request);
         return ResponseEntity.ok(showRoomDTO);
     }

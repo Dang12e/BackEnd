@@ -7,8 +7,6 @@ import com.testBackendDatabase.demo.Request.RegisterRequest;
 import com.testBackendDatabase.demo.Security.JwtTokenProvider;
 
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("/api/auth")
 public class LogInController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    LogInController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> Login(@RequestBody RegisterRequest request) {
