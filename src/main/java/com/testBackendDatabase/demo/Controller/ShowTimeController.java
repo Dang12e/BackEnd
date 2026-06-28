@@ -20,22 +20,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ShowTimeController {
 
 
-    @Autowired 
+    @Autowired
     private ShowTimeService showTimeService;
     @PostMapping("/getShowTime")
 public ResponseEntity<?> getShowTimes(@RequestBody ShowTimeRequest request) {
-    
+
     List<ShowTimeDTO> showTimeDTOs= showTimeService.getShowTimes(request);
     return ResponseEntity.ok(showTimeDTOs);
-    
+
 }
     @PostMapping("/addShowTime")
     public ResponseEntity<AddShowTimeDTO> postMethodName(@RequestBody AddShowTimeRequest request) {
         AddShowTimeDTO addShowTimeDTO= showTimeService.addShowTime(request);
+        System.out.println("nhận được ");
         return ResponseEntity.ok(addShowTimeDTO);
 
     }
-    
 
-    
+
+
 }

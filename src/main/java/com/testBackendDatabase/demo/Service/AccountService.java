@@ -11,6 +11,8 @@ import com.testBackendDatabase.demo.DTO.AccountDTO;
 import com.testBackendDatabase.demo.Repository.AccountRepository;
 import com.testBackendDatabase.demo.model.Account;
 
+import java.util.List;
+
 @Service
 public class AccountService {
 
@@ -25,6 +27,20 @@ public class AccountService {
         return AccountDTO.builder().email(account.getEmail()).id(account.getId())
         .role(account.getRole()).username(account.getUsername()).build();
 
+    }
+    @Transactional(readOnly = true)
+    public List<AccountDTO> getAllAccounts() {
+
+        return accountRepository.findAll()
+                .stream()
+                .map(account -> AccountDTO.builder()
+                        .id(account.getId())
+                        .username(account.getUsername())
+                        .email(account.getEmail())
+                        .role(account.getRole())
+                        .balance(account.getBalance())
+                        .build())
+                .toList();
     }
     
 }

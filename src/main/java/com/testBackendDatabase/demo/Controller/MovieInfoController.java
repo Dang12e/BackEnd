@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/api/feature")//CÁI NÀY TÔI TỰ ĐẶT AE KHÔNG THÍCH THÌ ĐẶT LẠI
 public class MovieInfoController {
 
-   
+
     private final MovieInfoService movieInfoService;
 
     MovieInfoController(MovieInfoService movieInfoService)
@@ -41,11 +41,6 @@ public class MovieInfoController {
         this.movieInfoService=movieInfoService;
     }
 
-    @GetMapping("/getShowTimes")
-    public ResponseEntity<List<ShowTimeDTO>> getShowTimes(@RequestParam Long movieID) {
-        List<ShowTimeDTO> showtimes= movieInfoService.getShowTimesByMovie(movieID);
-        return ResponseEntity.ok(showtimes);
-    }
 
     @PostMapping("/addMovieInfo")
     public ResponseEntity<AddMovieDTO> addMovieInfo(@Valid @RequestPart("data") AddMovieRequest request,@RequestPart("file") MultipartFile image) {
@@ -69,15 +64,16 @@ public class MovieInfoController {
     public Page<MovieDTO> getMoviesWithPage(@RequestParam int page) {
         return movieInfoService.getAllMovieWithPage(page);
     }
+
     @GetMapping("/getSearchResultWithPage")
     public Page<MovieDTO> getMethodName(@RequestParam int page,@RequestParam String key) {
         return movieInfoService.getSearchMovieResultPage(page, key);
     }
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
 }

@@ -9,6 +9,7 @@ import com.testBackendDatabase.demo.Service.AccountService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
 
 
 @RestController
@@ -27,6 +28,12 @@ public class AccountController {
     public ResponseEntity<AccountDTO> getAccountInfo() {
         AccountDTO accountDTO=accountService.getAccountInfo();
         return ResponseEntity.ok(accountDTO);
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<AccountDTO>> getAllAccounts() {
+
+        return ResponseEntity.ok(accountService.getAllAccounts());
+
     }
     
 }

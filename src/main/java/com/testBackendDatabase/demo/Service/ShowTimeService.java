@@ -56,28 +56,37 @@ public class ShowTimeService {
 
     }
     @Transactional(readOnly=true)
-    public List<ShowTimeDTO> getShowTimes(ShowTimeRequest request)
-    {
+    public List<ShowTimeDTO> getShowTimes(ShowTimeRequest request) {
+
+        System.out.println("Movie ID nhận được: " + request.getId());
+
         MovieInfo movie = movieInfoRepository.findById(request.getId())
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));
-    
-    // 2. Lấy suất chiếu và map thẳng địa chỉ vào DTO
-    List<ShowTimeDTO> result = showTimeRepository.findActiveByMovie(movie,LocalDateTime.now()).stream()
-            .map(st -> {
-                ShowTimeDTO dto = new ShowTimeDTO();
-                dto.setId(st.getId());
-                dto.setStartTime(st.getStartTime());
-                String CinemaName=st.getShowRoom().getCinema().getName();
-                dto.setCinemaName(CinemaName);
-                // Lấy địa chỉ rạp: ShowTime -> Room -> Cinema -> Address
-                String address = st.getShowRoom().getCinema().getAddress();
-                dto.setAddress(address); // Giả định DTO của bạn có trường này
-                
-                return dto;
-            })
-            .collect(Collectors.toList());
-            return result;
-    
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));
+
+        List<ShowTime> showTimes = showTimeRepository.findActiveByMovie(movie, LocalDateTime.now());
+
+        System.out.println("Số lượng ShowTime tìm thấy: " + showTimes.size());
+
+        for (ShowTime st : showTimes) {
+            System.out.println(
+                    "ID=" + st.getId()
+                            + ", MovieID=" + st.getMovie().getId()
+                            + ", Start=" + st.getStartTime()
+                            + ", End=" + st.getEndTime());
+        }
+
+        List<ShowTimeDTO> result = showTimes.stream()
+                .map(st -> {
+                    ShowTimeDTO dto = new ShowTimeDTO();
+                    dto.setId(st.getId());
+                    dto.setStartTime(st.getStartTime());
+                    dto.setCinemaName(st.getShowRoom().getCinema().getName());
+                    dto.setAddress(st.getShowRoom().getCinema().getAddress());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return result;
     }
     
 }
