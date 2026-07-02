@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddShowRoomRequest {
     @NotNull(message = "ID rạp không được để trống")
+    
     private String roomName;
     private Long cinemaID;
 

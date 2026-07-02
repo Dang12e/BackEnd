@@ -3,6 +3,7 @@ package com.testBackendDatabase.demo.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,4 +74,21 @@ public class AddShowRoomService {
             .build();
      
 }
+
+    public List<ShowRoomDTO> getAllShowRooms() {
+        // 1. Lấy toàn bộ danh sách phòng từ Repository
+        List<ShowRoom> showRooms = showRoomRepository.findAll();
+
+        // 2. Chuyển đổi từ Entity (ShowRoom) sang DTO (ShowRoomDTO)
+        List<ShowRoomDTO> dtoList = new ArrayList<>();
+        for (ShowRoom room : showRooms) {
+            ShowRoomDTO dto = ShowRoomDTO.builder()
+                    .id(room.getId())
+                    .roomName(room.getRoomName())
+                    .capacity(room.getCapacity())
+                    .build();
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
 }

@@ -1,7 +1,10 @@
 package com.testBackendDatabase.demo.Service;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,11 +16,22 @@ import com.testBackendDatabase.demo.model.Cinema;
 @Service
 public class AddCinemaService {
 
-    private final CinemaRepository cinemaRepository;
+    
+private final CinemaRepository cinemaRepository;
 
   AddCinemaService(CinemaRepository cinemaRepository) {
     this.cinemaRepository = cinemaRepository;
   }
+    public List<CinemaDTO> getAllCinemas() {
+        return cinemaRepository.findAll()
+                .stream()
+                .map(c -> CinemaDTO.builder()
+                        .id(c.getId())
+                        .name(c.getName())
+                        .address(c.getAddress())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Transactional
 public CinemaDTO addCinemaDTO(AddCinemaRequest request) {

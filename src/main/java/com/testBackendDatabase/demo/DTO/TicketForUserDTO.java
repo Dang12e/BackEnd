@@ -22,4 +22,6 @@ public class TicketForUserDTO {
     private Double price;        
     private LocalDateTime bookingTime;
     
+    private boolean used; // hiện xem vé đã được xác nhận hay chưa
+    private LocalDateTime usedAt; // thời điểm nhân viên quét vé
 }
