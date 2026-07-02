@@ -32,6 +32,7 @@ public ResponseEntity<?> getShowTimes(@RequestBody ShowTimeRequest request) {
     @PostMapping("/addShowTime")
     public ResponseEntity<AddShowTimeDTO> postMethodName(@RequestBody AddShowTimeRequest request) {
         AddShowTimeDTO addShowTimeDTO= showTimeService.addShowTime(request);
+        System.out.println("nhận được ");
         return ResponseEntity.ok(addShowTimeDTO);
 
     }

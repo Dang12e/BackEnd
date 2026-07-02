@@ -27,6 +27,7 @@ public class AddCinemaService {
                         .build())
                 .collect(Collectors.toList());
     }
+
     @Transactional
 public CinemaDTO addCinemaDTO(AddCinemaRequest request) {
     // 1. Chuyển từ Request sang Entity

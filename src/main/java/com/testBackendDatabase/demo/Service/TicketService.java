@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ import com.testBackendDatabase.demo.model.WalletTransaction;
 
 @Service
 public class TicketService {
-    private final int sizePage = 10;
+    private final int sizePage=10;
 
     @Autowired private AccountRepository accountRepository;
     @Autowired private TicketRepository ticketRepository;
@@ -53,8 +54,6 @@ public class TicketService {
             Account account = accountRepository.findByUsername(username)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED));
 
-            ShowTime showTime = showTimeRepository.findActiveByIdWithMovieAndRoom(
-                            request.getShowtimeId(), LocalDateTime.now())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Suất chiếu không tồn tại"));
 
             List<Seat> seats = seatRepository.findAllById(request.getSeatIds());
@@ -131,7 +130,6 @@ public class TicketService {
             e.printStackTrace();
             throw e;
         }
-    }
 
     // ============ LẤY VÉ USER (LIST) ============
     @Transactional(readOnly = true)

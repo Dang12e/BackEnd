@@ -27,6 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         http.csrf(csrf->csrf.disable()).authorizeHttpRequests(auth->auth.requestMatchers("/api/auth/**","/api/feature/**","/api/media/**","/api/Ticket/validateQR","/api/feature/addMovieInfo","/api/Ticket/**")
+        http.csrf(csrf->csrf.disable()).authorizeHttpRequests(auth->auth.requestMatchers("/api/auth/*","/api/feature/**","/api/media/*","/api/admin/**","/api/account/all")
         .permitAll().anyRequest().authenticated()
         );
 

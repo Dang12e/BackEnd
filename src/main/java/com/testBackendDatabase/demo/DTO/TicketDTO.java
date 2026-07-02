@@ -17,6 +17,7 @@ public class TicketDTO {
     private String ticketCode;
     private String qrCodeBase64;
 
+
     // Thông tin khách hàng
     private String customerName;
 
@@ -26,9 +27,9 @@ public class TicketDTO {
     private String roomName;
 
     // Chi tiết ghế
-    private String seatName;
-    private String seatType;
-    private Double price;
+    private String seatName;     // VD: A1, B2
+    private String seatType;     // VIP, NORMAL
+    private Double price;        // Giá cuối cùng của vé này
 
     // Trạng thái & Thời gian
     private LocalDateTime bookingTime;
@@ -36,4 +37,5 @@ public class TicketDTO {
     // 👇 THÊM 2 DÒNG NÀY
     private boolean used;
     private LocalDateTime usedAt;
+
 }

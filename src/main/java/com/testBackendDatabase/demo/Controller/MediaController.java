@@ -8,6 +8,7 @@ import com.testBackendDatabase.demo.Request.AddShowRoomRequest;
 import com.testBackendDatabase.demo.Service.AddCinemaService;
 import com.testBackendDatabase.demo.Service.AddShowRoomService;
 
+import com.testBackendDatabase.demo.Service.CinemaService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,10 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import com.testBackendDatabase.demo.DTO.ShowRoomDTO;
+import com.testBackendDatabase.demo.Service.AddShowRoomService;
+import java.util.List;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -28,7 +33,9 @@ public class MediaController {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    @Autowired 
+    @Autowired
+    private CinemaService cinemaService;
+    @Autowired
     private AddCinemaService addCinemaService;
     @Autowired
     private AddShowRoomService addShowRoomService;
@@ -50,21 +57,36 @@ public class MediaController {
     @PostMapping("/addCinema")
     public ResponseEntity<CinemaDTO> addCinema(@Valid @RequestBody AddCinemaRequest request) {
         //TODO: process POST request
-        
+        if(request.getName()==null || request.getName().trim().isEmpty()||
+                request.getAddress()==null||request.getAddress().trim().isEmpty()){
+            throw new IllegalArgumentException("Tên rạp và địa chỉ rạp không được để trống");
+
+        }
         CinemaDTO cinemaDTO =addCinemaService.addCinemaDTO(request);
         return ResponseEntity.ok(cinemaDTO);
     }
 
+    @PostMapping("/aaddShowRoom")
     @PostMapping("addShowRoom")
     public ResponseEntity<ShowRoomDTO> postMethodName(@Valid @RequestBody AddShowRoomRequest request) {
         //TODO: process POST request
-        ShowRoomDTO showRoomDTO= addShowRoomService.addShowRoom(request);
+        ShowRoomDTO showRoomDTO = addShowRoomService.addShowRoom(request);
         return ResponseEntity.ok(showRoomDTO);
     }
+
+    @GetMapping("/getCinemas")
+    public ResponseEntity<List<CinemaDTO>> getCinemas() {
+        List<CinemaDTO> cinemas = cinemaService.getAllCinemas();
     @GetMapping("/cinemas")
     public ResponseEntity<List<CinemaDTO>> getAllCinemas() {
         List<CinemaDTO> cinemas = addCinemaService.getAllCinemas();
         return ResponseEntity.ok(cinemas);
     }
-    
+    @PostMapping("/getShowRooms")
+    public ResponseEntity<List<ShowRoomDTO>> getShowRooms() {
+        List<ShowRoomDTO> showRoomDTOs = addShowRoomService.getAllShowRooms();
+        return ResponseEntity.ok(showRoomDTOs);
+    }
+
+
 }
