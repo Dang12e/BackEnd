@@ -35,4 +35,39 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime,Long> {
             @Param("id") Long id, 
             @Param("currentTime") LocalDateTime currentTime
     );
+
+    @Query("SELECT st FROM ShowTime st " +
+           "WHERE st.id = :id " +
+           "AND st.endTime > :currentTime")
+    Optional<ShowTime> findActiveShowTimeById(
+            @Param("id") Long id,
+            @Param("currentTime") LocalDateTime currentTime
+    );
+
+    // Check if an active ShowTime exists by ID
+    @Query("SELECT COUNT(st) > 0 FROM ShowTime st " +
+           "WHERE st.id = :id " +
+           "AND st.endTime > :currentTime")
+    boolean existActiveShowTimeID(
+            @Param("id") Long id,
+            @Param("currentTime") LocalDateTime currentTime
+    );
+
+    @Query("""
+    SELECT st
+    FROM ShowTime st
+    JOIN FETCH st.movie
+    JOIN FETCH st.showRoom sr
+    JOIN FETCH sr.cinema
+    WHERE st.endTime > :currentTime
+    
+    """)
+    List<ShowTime> findActiveShowTimes(@Param("currentTime") LocalDateTime currentTime);
+
+    @Query("""
+       SELECT COUNT(st)
+       FROM ShowTime st
+       WHERE st.endTime > :currentTime
+       """)
+    Long countActiveShowTimes(@Param("currentTime") LocalDateTime currentTime);
 }

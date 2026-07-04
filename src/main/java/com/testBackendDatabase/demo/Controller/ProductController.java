@@ -1,9 +1,9 @@
 package com.testBackendDatabase.demo.Controller;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.testBackendDatabase.demo.Repository.ProductRepository;
 import com.testBackendDatabase.demo.model.Product;
+import org.springframework.lang.NonNull;
 
 import java.util.List;
 
@@ -11,12 +11,15 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    @Autowired
-    private ProductRepository productRepository; // Spring tự động tiêm Bean của Repository vào đây
+    private final ProductRepository productRepository;
+
+    ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    } // Spring tự động tiêm Bean của Repository vào đây
 
     // 1. Xử lý POST request để THÊM sản phẩm vào MySQL
     @PostMapping("/add")
-    public Product addProduct(@RequestBody Product newProduct) {
+    public Product addProduct(@RequestBody @NonNull Product newProduct) {
         // Hàm save() có sẵn trong JpaRepository sẽ tự động chèn một dòng mới vào bảng Product
         return productRepository.save(newProduct);
     }

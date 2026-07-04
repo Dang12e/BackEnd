@@ -3,6 +3,7 @@ package com.testBackendDatabase.demo.Controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +26,7 @@ public class SeatViewController {
     }
 
     @GetMapping("/getSeatView")
-    public ResponseEntity<List<SeatDTO>> getSeatView(@RequestParam("showRoomID") Long showTimeID)
+    public ResponseEntity<List<SeatDTO>> getSeatView(@RequestParam("showTimeID") @NonNull Long showTimeID)
     {
         List<SeatDTO> seatDTOs= seatViewService.getSeatView(showTimeID);
         return ResponseEntity.ok(seatDTOs);

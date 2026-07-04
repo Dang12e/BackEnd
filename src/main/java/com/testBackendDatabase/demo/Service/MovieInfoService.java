@@ -3,13 +3,14 @@ package com.testBackendDatabase.demo.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,20 +28,24 @@ import com.testBackendDatabase.demo.model.MovieInfo;
 
 
 
+
 @Service
 public class MovieInfoService {
 
-@Autowired
-private MovieInfoRepository movieInfoRepository;
-@Autowired
-private ShowTimeRepository showTimeRepository;
-@Autowired
-private CloudinaryService cloudinaryService;
+private final MovieInfoRepository movieInfoRepository;
+private final ShowTimeRepository showTimeRepository;
+private final CloudinaryService cloudinaryService;
 
 private final int pageSize=15;
 
+    MovieInfoService(MovieInfoRepository movieInfoRepository, CloudinaryService cloudinaryService, ShowTimeRepository showTimeRepository) {
+        this.movieInfoRepository = movieInfoRepository;
+        this.showTimeRepository = showTimeRepository;
+        this.cloudinaryService = cloudinaryService;
+    }
+
 @Transactional(readOnly = true) // Tối ưu hiệu năng vì chỉ đọc dữ liệu
-    public List<ShowTimeDTO> getShowTimesByMovie(Long movieId) {
+    public List<ShowTimeDTO> getShowTimesByMovie(@NonNull Long movieId) {
         // 1. Logic kiểm tra phim tồn tại nằm ở đây
         MovieInfo movie = movieInfoRepository.findById(movieId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Phim không tồn tại!"));
@@ -68,14 +73,14 @@ private final int pageSize=15;
         {
          throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "File ảnh không hợp lệ hoặc lỗi đường truyền!");
         }
-        MovieInfo movie =MovieInfo.builder().description(request.getDescription())
+        MovieInfo movie =Objects.requireNonNull(MovieInfo.builder().description(request.getDescription())
         .duration(request.getDuration())
         .genre(request.getGenre())
         .rating(request.getRating())
         .releaseDate(request.getReleaseDate())
         .title(request.getTitle())
         .image(image)
-        .build();
+        .build());
 
         
 
@@ -88,7 +93,7 @@ private final int pageSize=15;
     }
 
     @Transactional(readOnly=true)
-    public MovieInfoDTO getMovieDetail(Long movieID)
+    public MovieInfoDTO getMovieDetail(@NonNull Long movieID)
     {
        MovieInfo movieInfo= movieInfoRepository.findById(movieID).
        orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND,"khong tim thay phim"));
@@ -118,9 +123,12 @@ private final int pageSize=15;
 
     }
     @Transactional(readOnly = true)
-    public Page<MovieDTO> getAllMovieWithPage(int page)
+    public Page<MovieDTO> getAllMovieWithPage(int page,int size)
     {
-        Pageable pageable=PageRequest.of(page, pageSize);
+        if(size>pageSize)
+            { size=pageSize;
+            }
+        Pageable pageable=PageRequest.of(page, size);
         Page<MovieInfo> result=movieInfoRepository.findAll(pageable);
         
         return result.map(movieInfo->
@@ -133,9 +141,12 @@ private final int pageSize=15;
         
     }
     @Transactional(readOnly = true)
-    public Page<MovieDTO> getSearchMovieResultPage(int page,String key)
+    public Page<MovieDTO> getSearchMovieResultPage(int page,int size,String key)
     {
-        Pageable pageable= PageRequest.of(page, pageSize);
+        if(size>pageSize)
+            { size=pageSize;
+            }
+        Pageable pageable=PageRequest.of(page, size);
         Page<MovieInfo> result= movieInfoRepository.findByTitleContaining(key, pageable);
         return result.map(movieInfo->
             MovieDTO.builder().genre(movieInfo.getGenre())
@@ -144,5 +155,24 @@ private final int pageSize=15;
             .releaseDate(movieInfo.getReleaseDate())
             .title(movieInfo.getTitle()).build()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<MovieDTO> getMovieForHomePage(int page,int size)
+    {
+        if(size>pageSize)
+            { size=pageSize;
+            }
+        Pageable pageable=PageRequest.of(page, size);
+        Page<MovieInfo> result=movieInfoRepository.findAll(pageable);
+        
+        return result.map(movieInfo->
+            MovieDTO.builder().genre(movieInfo.getGenre())
+            .id(movieInfo.getId())
+            .image(movieInfo.getImage())
+            .releaseDate(movieInfo.getReleaseDate())
+            .title(movieInfo.getTitle()).build()
+        ); 
+        
     }
 }

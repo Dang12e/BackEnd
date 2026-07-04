@@ -1,6 +1,9 @@
 package com.testBackendDatabase.demo.Service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,16 +15,30 @@ import com.testBackendDatabase.demo.model.Cinema;
 @Service
 public class AddCinemaService {
 
-    @Autowired
-    private CinemaRepository cinemaRepository;
+    
+private final CinemaRepository cinemaRepository;
+
+  AddCinemaService(CinemaRepository cinemaRepository) {
+    this.cinemaRepository = cinemaRepository;
+  }
+    public List<CinemaDTO> getAllCinemas() {
+        return cinemaRepository.findAll()
+                .stream()
+                .map(c -> CinemaDTO.builder()
+                        .id(c.getId())
+                        .name(c.getName())
+                        .address(c.getAddress())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Transactional
 public CinemaDTO addCinemaDTO(AddCinemaRequest request) {
     // 1. Chuyển từ Request sang Entity
-    Cinema cinema = Cinema.builder()
+    Cinema cinema = Objects.requireNonNull(Cinema.builder()
             .name(request.getName())
             .address(request.getAddress())
-            .build();
+            .build());
             
     // 2. Lưu vào DB
     Cinema savedCinema = cinemaRepository.save(cinema);

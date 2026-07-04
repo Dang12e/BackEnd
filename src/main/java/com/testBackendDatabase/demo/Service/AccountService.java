@@ -1,5 +1,6 @@
 package com.testBackendDatabase.demo.Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,8 +15,11 @@ import com.testBackendDatabase.demo.model.Account;
 @Service
 public class AccountService {
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
+
+    AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
     @Transactional(readOnly=true)
     public AccountDTO getAccountInfo()
     {
@@ -27,4 +31,19 @@ public class AccountService {
 
     }
     
+    @Transactional(readOnly = true)
+    public List<AccountDTO> getAllAccounts() {
+
+        return accountRepository.findAll()
+                .stream()
+                .map(account -> AccountDTO.builder()
+                        .id(account.getId())
+                        .username(account.getUsername())
+                        .email(account.getEmail())
+                        .role(account.getRole())
+                        .balance(account.getBalance())
+                        .build())
+                .toList();
+    }
+
 }

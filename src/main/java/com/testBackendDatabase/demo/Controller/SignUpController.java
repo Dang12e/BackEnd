@@ -1,6 +1,7 @@
 package com.testBackendDatabase.demo.Controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Objects;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,10 +18,17 @@ import com.testBackendDatabase.demo.model.Account;
 @RequestMapping("/api/auth")
 public class SignUpController {
 
-    @Autowired 
-    private AccountRepository accountRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    
+    private final AccountRepository accountRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public SignUpController(AccountRepository accountRepository,PasswordEncoder passwordEncoder)
+    {
+        this.accountRepository=accountRepository;
+        this.passwordEncoder=passwordEncoder;
+    }
+
+
 
     @PostMapping("/register")
     public ResponseEntity<String> Register(@RequestBody RegisterRequest loginRequest)
@@ -36,10 +44,15 @@ public class SignUpController {
         String encodedPassword= passwordEncoder.encode(loginRequest.getPassword());
 
         Account account= 
-        Account.builder().username(loginRequest.getUsername()).
-        password(encodedPassword).balance(0d)
-        .email(loginRequest.getEmail())
-        .role("ROLE_USER").build();
+        Objects.requireNonNull(
+        Account.builder()
+            .username(loginRequest.getUsername())
+            .password(encodedPassword)
+            .balance(0d)
+            .email(loginRequest.getEmail())
+            .role("ROLE_USER")
+            .build()
+    );
 
         accountRepository.save(account);
 

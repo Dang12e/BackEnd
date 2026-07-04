@@ -22,4 +22,6 @@ public class BasicTicketDTO {
     private Double price;
     private LocalDateTime bookingTime;
 
+    private boolean used; // ghi xác nhận hoặc chưa xác nhận cho vé
+    private LocalDateTime usedAt; //thời điểm nhân viên quét vé
 }

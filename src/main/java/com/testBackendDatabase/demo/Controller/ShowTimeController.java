@@ -9,8 +9,8 @@ import com.testBackendDatabase.demo.Request.ShowTimeRequest;
 import com.testBackendDatabase.demo.Service.ShowTimeService;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -20,17 +20,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ShowTimeController {
 
 
-    @Autowired 
-    private ShowTimeService showTimeService;
+    private final ShowTimeService showTimeService;
+
+    ShowTimeController(ShowTimeService showTimeService) {
+        this.showTimeService = showTimeService;
+    }
     @PostMapping("/getShowTime")
-public ResponseEntity<?> getShowTimes(@RequestBody ShowTimeRequest request) {
+public ResponseEntity<List<ShowTimeDTO>> getShowTimes(@RequestBody @NonNull ShowTimeRequest request) {
     
     List<ShowTimeDTO> showTimeDTOs= showTimeService.getShowTimes(request);
     return ResponseEntity.ok(showTimeDTOs);
     
 }
     @PostMapping("/addShowTime")
-    public ResponseEntity<AddShowTimeDTO> postMethodName(@RequestBody AddShowTimeRequest request) {
+    public ResponseEntity<AddShowTimeDTO> postMethodName(@RequestBody @NonNull AddShowTimeRequest request) {
         AddShowTimeDTO addShowTimeDTO= showTimeService.addShowTime(request);
         return ResponseEntity.ok(addShowTimeDTO);
 
