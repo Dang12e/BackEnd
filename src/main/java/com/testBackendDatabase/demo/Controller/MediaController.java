@@ -55,7 +55,7 @@ public class MediaController {
     public ResponseEntity<CinemaDTO> addCinema(@Valid @RequestBody AddCinemaRequest request) {
         
         
-        //TODO: process POST request
+        
         if(request.getName()==null || request.getName().trim().isEmpty()||
                 request.getAddress()==null||request.getAddress().trim().isEmpty()){
             throw new IllegalArgumentException("Tên rạp và địa chỉ rạp không được để trống");

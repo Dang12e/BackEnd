@@ -1,14 +1,11 @@
 package com.testBackendDatabase.demo.Service;
 
-import com.testBackendDatabase.demo.Repository.WalletTransactionRepository;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 
-import org.springframework.http.HttpStatusCode;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +25,6 @@ import com.testBackendDatabase.demo.Repository.AccountRepository;
 import com.testBackendDatabase.demo.Repository.SeatRepository;
 import com.testBackendDatabase.demo.Repository.ShowTimeRepository;
 import com.testBackendDatabase.demo.Repository.TicketRepository;
-import com.testBackendDatabase.demo.Request.TicketBookingRequest;
 import com.testBackendDatabase.demo.model.Account;
 import com.testBackendDatabase.demo.model.Seat;
 import com.testBackendDatabase.demo.model.ShowTime;
@@ -204,6 +198,8 @@ public class TicketService {
                 .seatType(ticket.getSeat().getType())
                 .startTime(ticket.getShowTime().getStartTime())
                 .ticketCode(ticket.getTicketCode())
+                .used(ticket.isUsed())
+                .usedAt(LocalDateTime.now())
                 .build();
     }
 
@@ -216,7 +212,7 @@ public class TicketService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "không tìm thấy tên người dùng"));
 
         Pageable pageable = PageRequest.of(page, sizePage);
-        Page<Ticket> result = ticketRepository.findByAccountId(account.getId(), pageable);
+        Page<Ticket> result = ticketRepository.findnotusedTicketbyAccountID(account.getId(), pageable);
         return result.map(ticket ->
                 BasicTicketDTO.builder()
                         .bookingTime(ticket.getBookingTime())

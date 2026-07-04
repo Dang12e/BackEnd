@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.testBackendDatabase.demo.DTO.BasicTicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketForUserDTO;
-import com.testBackendDatabase.demo.Request.TicketBookingRequest;
 import com.testBackendDatabase.demo.Service.TicketService;
 
 import java.util.List;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 

@@ -29,13 +29,23 @@ public interface TicketRepository extends JpaRepository<Ticket,Long> {
        "WHERE a.id = :accountId") // Sử dụng alias.id
 List<Ticket> findAllByAccountId(@Param("accountId") Long accountId);
 
+    @Query("SELECT t FROM Ticket t " +
+       "JOIN FETCH t.account a " +
+       "JOIN FETCH t.showTime st " +
+       "JOIN FETCH st.movie " +
+       "JOIN FETCH st.showRoom " +
+       "JOIN FETCH t.seat " +
+       "WHERE a.id = :accountId AND t.isUsed = false " +
+       "ORDER BY t.id DESC")
+Page<Ticket> findnotusedTicketbyAccountID(@Param("accountId") Long accountId, Pageable pageable);
+
 @Query("SELECT t FROM Ticket t " +
        "JOIN FETCH t.account a " + // Đặt alias 'a' cho account
        "JOIN FETCH t.showTime st " +
        "JOIN FETCH st.movie " +
        "JOIN FETCH st.showRoom " +
        "JOIN FETCH t.seat " +
-       "WHERE a.id = :accountId and t.ticketCode= :tCode"
+       "WHERE a.id = :accountId and t.ticketCode= :tCode "
 )
 Optional<Ticket> findByAccountAndTicketCodeFetchJoin(@Param("accountId") Long accountId,@Param("tCode") String tCode);
 
@@ -51,6 +61,9 @@ List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatI
     })
     Page<Ticket> findByAccountId(Long accountId, Pageable pageable);
 
-Optional<Ticket> findByTicketCode(String ticketCode);
+    Optional<Ticket> findByTicketCode(String ticketCode);
+
+    @Query("SELECT COUNT(t) FROM Ticket t")
+    Long countSoldTickets();
 
 }

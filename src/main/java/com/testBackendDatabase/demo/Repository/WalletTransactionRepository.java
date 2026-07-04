@@ -12,6 +12,10 @@ public interface WalletTransactionRepository extends JpaRepository<WalletTransac
 
     boolean existsByTxnRefAndStatus(String txnRef, String string);
 
+    @Query("SELECT COALESCE(SUM(w.amount), 0) FROM WalletTransaction w " +
+            "WHERE w.status = 'SUCCESS' AND w.amount > 0")
+    Double tinhTongDoanhThu();
+
 }
     
 

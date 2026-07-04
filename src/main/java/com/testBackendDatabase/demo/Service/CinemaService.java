@@ -2,8 +2,6 @@ package com.testBackendDatabase.demo.Service;
 
 import com.testBackendDatabase.demo.DTO.CinemaDTO;
 import com.testBackendDatabase.demo.Repository.CinemaRepository;
-import com.testBackendDatabase.demo.model.Cinema;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +10,11 @@ import java.util.stream.Collectors;
 @Service
 public class CinemaService {
 
-    @Autowired
-    private CinemaRepository cinemaRepository;
+    private final CinemaRepository cinemaRepository;
+
+    CinemaService(CinemaRepository cinemaRepository) {
+        this.cinemaRepository = cinemaRepository;
+    }
 
     public List<CinemaDTO> getAllCinemas() {
         return cinemaRepository.findAll()
