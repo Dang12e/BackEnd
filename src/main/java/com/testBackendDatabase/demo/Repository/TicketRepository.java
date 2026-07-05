@@ -66,4 +66,17 @@ List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatI
     @Query("SELECT COUNT(t) FROM Ticket t")
     Long countSoldTickets();
 
+    @Query("SELECT t FROM Ticket t " +
+       "JOIN FETCH t.account a " +
+       "JOIN FETCH t.showTime st " +
+       "JOIN FETCH st.movie " +
+       "JOIN FETCH st.showRoom " +
+       "JOIN FETCH t.seat " +
+       "WHERE a.id = :accountId AND t.isUsed = true " +
+       "ORDER BY t.id DESC")
+Page<Ticket> findusedTicketbyAccountID(@Param("accountId") Long accountId, Pageable pageable);
+
+
+    
+
 }

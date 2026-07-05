@@ -45,7 +45,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o " +
            "JOIN FETCH o.account a " +
            "JOIN FETCH o.showTime " +
-           "WHERE a.id = :accountId " +
+           "WHERE a.id = :accountId " + 
+           "AND o.status ='SUCCESS'" +
        "ORDER BY o.id desc")
     @EntityGraph(attributePaths = {"account", "showTime","showTime.movie"})
     Page<Order> findByAccount_id(Long accountId, Pageable pageable);

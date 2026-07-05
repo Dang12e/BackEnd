@@ -279,5 +279,32 @@ public class TicketService {
 
         return "Xác thực vé thành công!";
     }
+
+    @Transactional(readOnly = true)
+    public Page<BasicTicketDTO> getUsedTicketsWithPageForUser(int page) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        Account account = accountRepository.findByUsername(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "không tìm thấy tên người dùng"));
+
+        Pageable pageable = PageRequest.of(page, sizePage);
+        Page<Ticket> result = ticketRepository.findusedTicketbyAccountID(account.getId(), pageable);
+        return result.map(ticket ->
+                BasicTicketDTO.builder()
+                        .bookingTime(ticket.getBookingTime())
+                        .customerName(name)
+                        .movieTitle(ticket.getShowTime().getMovie().getTitle())
+                        .price(ticket.getPrice())
+                        .roomName(ticket.getShowTime().getShowRoom().getRoomName())
+                        .seatName(ticket.getSeat().getName())
+                        .seatType(ticket.getSeat().getType())
+                        .startTime(ticket.getShowTime().getStartTime())
+                        .ticketCode(ticket.getTicketCode())
+                        .used(ticket.isUsed())
+                        .usedAt(ticket.getUsedAt())
+                        .build()
+        );
+    }
+
 }
 

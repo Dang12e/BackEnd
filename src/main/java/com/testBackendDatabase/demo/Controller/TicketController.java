@@ -54,6 +54,12 @@ public class TicketController {
         return ticketService.getTicketsWithPageForUser(page);
     }
 
+    @GetMapping("/getUsersUsedTicketPage")
+    public Page<BasicTicketDTO> getUsersUsedTicketPage(@RequestParam int page) {
+        return ticketService.getUsedTicketsWithPageForUser(page);
+    }
+    
+
     @PostMapping("/validateQR")
     public ResponseEntity<String> validateQR(
             @RequestParam String ticketCode,
