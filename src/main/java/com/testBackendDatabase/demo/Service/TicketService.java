@@ -82,10 +82,11 @@ public class TicketService {
 
     double totalAmount = 0;
     for (Seat seat : seats) {
+        double showtimeprice = showTime.getPrice();
         double price = seat.getBasePrice();
         if ("VIP".equals(seat.getType())) {
             // Logic giá VIP của bạn (có thể nhân hệ số 1.5 như ở code trước)
-            price = price * 1.5; 
+            price = price * 1.5 + showtimeprice;
         }
         totalAmount += price;
     }
@@ -93,6 +94,7 @@ public class TicketService {
 
     List<Ticket> tickets = new ArrayList<>();
     for (Seat seat : seats) {
+        double totalprice = (seat.getType()=="VIP") ? 75000: 50000;
         String ticketCode = UUID.randomUUID().toString();
 
         Ticket ticket = Ticket.builder()
@@ -101,7 +103,7 @@ public class TicketService {
                 .showTime(showTime)
                 .seat(seat)
                 .account(account)
-                .price(seat.getBasePrice()) // hoặc giá sau khi tính VIP
+                .price(totalprice + showTime.getPrice()) // hoặc giá sau khi tính VIP
                 .bookingTime(LocalDateTime.now())
                 .build();
         tickets.add(ticket);
@@ -279,5 +281,32 @@ public class TicketService {
 
         return "Xác thực vé thành công!";
     }
+
+    @Transactional(readOnly = true)
+    public Page<BasicTicketDTO> getUsedTicketsWithPageForUser(int page) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String name = authentication.getName();
+        Account account = accountRepository.findByUsername(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "không tìm thấy tên người dùng"));
+
+        Pageable pageable = PageRequest.of(page, sizePage);
+        Page<Ticket> result = ticketRepository.findusedTicketbyAccountID(account.getId(), pageable);
+        return result.map(ticket ->
+                BasicTicketDTO.builder()
+                        .bookingTime(ticket.getBookingTime())
+                        .customerName(name)
+                        .movieTitle(ticket.getShowTime().getMovie().getTitle())
+                        .price(ticket.getPrice())
+                        .roomName(ticket.getShowTime().getShowRoom().getRoomName())
+                        .seatName(ticket.getSeat().getName())
+                        .seatType(ticket.getSeat().getType())
+                        .startTime(ticket.getShowTime().getStartTime())
+                        .ticketCode(ticket.getTicketCode())
+                        .used(ticket.isUsed())
+                        .usedAt(ticket.getUsedAt())
+                        .build()
+        );
+    }
+
 }
 

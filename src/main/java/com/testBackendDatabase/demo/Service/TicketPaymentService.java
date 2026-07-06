@@ -118,7 +118,8 @@ public BookingPaymentResponse generateBookingPaymentURL(@Valid @NonNull TicketBo
     if (seats.size() != bookingRequest.getSeatIds().size()) {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Some seats do not exist");
     }
-    long totalAmount = calculateTotalPrice(seats);
+    long totalAmount = calculateTotalPrice(seats, showTime);
+    System.out.println("TOTALAMOUT LAAAAAAAAA:"+totalAmount);
 
     String seatIdsStr = bookingRequest.getSeatIds().stream()
             .map(String::valueOf)
@@ -291,14 +292,19 @@ public void vnPayCallBack(Map<String, String> queryParams,Map<String, String> re
     return;
     
 }
-public Long calculateTotalPrice(List<Seat> seats) {
+public Long calculateTotalPrice(List<Seat> seats, ShowTime showTime) {
         long totalAmount = 0;
+        double showtimeprice = showTime.getPrice();
+    System.out.println("showtime LAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:" +showtimeprice);
         for (Seat seat : seats) {
             double price = seat.getBasePrice();
             if ("VIP".equals(seat.getType())) {
-                price = price * 1.5; 
+                price = price * 1.5 + showtimeprice;
+
             }
-            totalAmount += (long) price; // Ép kiểu cẩn thận cuối luồng
+            System.out.println("PRICE LAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:"+price);
+            totalAmount += (long) price +showtimeprice;
+            System.out.println("TOTALAMOUT LAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:"+totalAmount);
         }
         return totalAmount;
     }

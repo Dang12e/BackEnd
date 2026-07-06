@@ -17,5 +17,6 @@ public class AdminShowTimeDTO {
     private String address;
     private String cinemaName;
     private LocalDateTime startTime;
-
+    private LocalDateTime endTime;
+    private double price;
 }
