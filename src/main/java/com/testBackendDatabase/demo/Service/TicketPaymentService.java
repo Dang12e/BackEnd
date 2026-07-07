@@ -299,8 +299,8 @@ public Long calculateTotalPrice(List<Seat> seats, ShowTime showTime) {
         for (Seat seat : seats) {
             double price = seat.getBasePrice();
             if ("VIP".equals(seat.getType())) {
-                price = price * 1.5 + showtimeprice;
-
+                price = price * 1.5;
+                
             }
             System.out.println("PRICE LAAAAAAAAAAAAAAAAAAAAAAAAAAAAA:"+price);
             totalAmount += (long) price +showtimeprice;

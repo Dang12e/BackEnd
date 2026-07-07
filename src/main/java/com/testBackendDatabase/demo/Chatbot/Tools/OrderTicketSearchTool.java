@@ -10,6 +10,8 @@ import com.testBackendDatabase.demo.Repository.OrderRepository;
 import com.testBackendDatabase.demo.model.Account;
 import com.testBackendDatabase.demo.model.Order;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -61,17 +63,16 @@ public class OrderTicketSearchTool implements ChatbotTool {
                     "type", "object",
                     "properties", Map.of(
                         "order_id", Map.of(
-                            "type", "integer",
+                            "type", java.util.List.of("integer", "null"),
                             "description", "Specific order code or ticket ID if the user mentions one (id is a long type)"
                         ),
                         "movie_title", Map.of(
-                            "type", "string",
+                            "type", java.util.List.of("string", "null"),
                             "description", "Filter by movie name if the user asks about a specific movie history. E.g., 'Lat Mat'"
                         ),
                         "status_filter", Map.of(
-                            "type", "string",
-                            "enum", List.of("SUCCESS", "PENDING"),
-                            "description", "Filter by order status. CRITICAL: Omit this field entirely if the user does not specify a status pass SUCCESS. Never pass an empty string."
+                            "type", java.util.List.of("string", "null"),
+                            "description", "Filter by order status. Allowed values: SUCCESS, PENDING. Omit this field if unknown or not provided."
                         )
                     )
                     // KHÔNG CÓ TRƯỜNG REQUIRED: AI hoàn toàn tự do nhặt tham số tùy theo độ mông lung của câu hỏi
@@ -89,12 +90,19 @@ public class OrderTicketSearchTool implements ChatbotTool {
             JsonNode rootNode = objectMapper.readTree(argumentsJson);
 
             
-            if (rootNode.has("order_id") && !rootNode.get("order_id").asText().isEmpty()) {
-                String orderId = rootNode.get("order_id").asText();
+            if (rootNode.hasNonNull("order_id") && !rootNode.get("order_id").asText().isBlank() && !"null".equalsIgnoreCase(rootNode.get("order_id").asText())) {
+                String orderId = rootNode.get("order_id").asText().trim();
                 System.out.println("-> Tra cứu đích danh mã đơn: " + orderId);
-                
-                Order order =orderRepository.findByIdAndAccount_Id(Long.parseLong(orderId), accountId).orElseThrow(()->
-            new ResponseStatusException(HttpStatus.NOT_FOUND,"không tìm thấy đơn hàng"));
+
+                long parsedOrderId;
+                if (rootNode.get("order_id").isNumber()) {
+                    parsedOrderId = rootNode.get("order_id").asLong();
+                } else {
+                    parsedOrderId = Long.parseLong(orderId);
+                }
+
+                Order order = orderRepository.findByIdAndAccount_Id(parsedOrderId, accountId).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "không tìm thấy đơn hàng"));
             Map<String, Object> singleResult = Map.of(
                 "status", "success",
                 "type", "single",
@@ -108,13 +116,10 @@ public class OrderTicketSearchTool implements ChatbotTool {
             );
             return objectMapper.writeValueAsString(singleResult);
             }
-            
 
             // Tình huống 2: Người dùng tìm kiếm mông lung (Tìm kiếm động dựa trên bộ lọc)
-            
 
-           
-            Specification<Order> spec=buildSearchArgs(rootNode,accountId);
+            Specification<Order> spec = buildSearchArgs(rootNode, accountId);
             List<Order> orders= orderRepository.findAll(spec);
 
             List<Map<String, Object>> resultList = orders.stream().map(s -> Map.<String, Object>of(
@@ -159,31 +164,32 @@ public class OrderTicketSearchTool implements ChatbotTool {
         }
     }
 
-    private Specification<Order> buildSearchArgs(JsonNode rootNode,Long accountID)
-    {
-        Specification<Order> spec = (root, query, criteriaBuilder) -> criteriaBuilder.conjunction();
-        spec.and((root, query, criteriaBuilder) -> {return criteriaBuilder.equal(root.get("account_id"),accountID);});
-        String movieTitle = rootNode.has("movie_title") ? rootNode.get("movie_title").asText() : "";
-            String statusFilter = rootNode.has("status_filter") ? rootNode.get("status_filter").asText() : "";
-        if(!movieTitle.isBlank())
-        {
-            spec.and((root, query, criteriaBuilder)->
-        {
-           Join<Object, Object> showtimeJoin = root.join("showtime");
-            Join<Object, Object> movieJoin = showtimeJoin.join("movie");
-            
-            // Tìm kiếm tương đối LIKE %tên_phim%
-            return criteriaBuilder.like(movieJoin.get("title"), "%" + movieTitle + "%");
-        });
-        }
-         if(!statusFilter.isBlank())
-         {
-            spec.and((root, query, criteriaBuilder)->
-        {
-            return criteriaBuilder.equal(root.get("status"),statusFilter);
-        });
-         }
-         
-        return spec;
+    private Specification<Order> buildSearchArgs(JsonNode rootNode, Long accountID) {
+        return (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // account id predicate (join through account relationship if necessary)
+            try {
+                predicates.add(criteriaBuilder.equal(root.get("account").get("id"), accountID));
+            } catch (IllegalArgumentException ex) {
+                // fallback if mapping uses account_id directly
+                predicates.add(criteriaBuilder.equal(root.get("account_id"), accountID));
+            }
+
+            String movieTitle = rootNode.hasNonNull("movie_title") ? rootNode.get("movie_title").asText().trim() : "";
+            String statusFilter = rootNode.hasNonNull("status_filter") ? rootNode.get("status_filter").asText().trim() : "";
+
+            if (movieTitle != null && !movieTitle.isBlank()) {
+                Join<Object, Object> showtimeJoin = root.join("showtime");
+                Join<Object, Object> movieJoin = showtimeJoin.join("movie");
+                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(movieJoin.get("title")), "%" + movieTitle.toLowerCase() + "%"));
+            }
+
+            if (statusFilter != null && !statusFilter.isBlank()) {
+                predicates.add(criteriaBuilder.equal(root.get("status"), statusFilter));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
     }
 }

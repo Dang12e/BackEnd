@@ -61,6 +61,9 @@ public class ChatbotService {
             // Lượt gọi 1: Gửi câu hỏi + Định nghĩa Tool lên AI
             Map<String, Object> response = restTemplate.postForObject(url, entity, Map.class);
             String aIresponse= handleAIResponse(response, messages, headers);
+            if (aIresponse == null) {
+                aIresponse = "{\"status\": \"error\", \"message\": \"No response from AI due to internal error.\"}";
+            }
             chatContextService.saveChatHistory(userID, userMessage, aIresponse);
              return aIresponse;
         } catch (HttpClientErrorException e) {
