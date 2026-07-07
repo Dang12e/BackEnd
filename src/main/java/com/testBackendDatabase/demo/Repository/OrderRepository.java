@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,11 +15,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.testBackendDatabase.demo.model.Order;
+import com.testBackendDatabase.demo.model.ShowTime;
 
 import jakarta.persistence.LockModeType;
 
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends JpaRepository<Order, Long>,JpaSpecificationExecutor<Order> {
 @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT o FROM Order o WHERE o.id = :id")
     Optional<Order> findByIdForUpdate(@Param("id") Long id);
@@ -50,5 +52,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
        "ORDER BY o.id desc")
     @EntityGraph(attributePaths = {"account", "showTime","showTime.movie"})
     Page<Order> findByAccount_id(Long accountId, Pageable pageable);
+    Optional<Order> findByIdAndAccount_Id(Long id,Long account_id);
     
 }

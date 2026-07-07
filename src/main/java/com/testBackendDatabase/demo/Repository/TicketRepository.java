@@ -7,14 +7,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.testBackendDatabase.demo.model.Account;
 import com.testBackendDatabase.demo.model.Seat;
 import com.testBackendDatabase.demo.model.ShowTime;
 import com.testBackendDatabase.demo.model.Ticket;
 
-public interface TicketRepository extends JpaRepository<Ticket,Long> {
+public interface TicketRepository extends JpaRepository<Ticket,Long>,JpaSpecificationExecutor<Ticket> {
 
     Ticket findByShowTime_idAndSeat_id(ShowTime showTime,Seat seat);
 
@@ -75,6 +77,8 @@ List<Long> findBookedSeatIds(@Param("showTimeId") Long showTimeId, @Param("seatI
        "WHERE a.id = :accountId AND t.isUsed = true " +
        "ORDER BY t.id DESC")
 Page<Ticket> findusedTicketbyAccountID(@Param("accountId") Long accountId, Pageable pageable);
+
+    Optional<Ticket> findByIdAndAccount_Id(long long1, Long accountId);
 
 
     

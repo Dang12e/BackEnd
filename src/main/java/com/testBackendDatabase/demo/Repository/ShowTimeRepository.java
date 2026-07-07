@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,7 +14,7 @@ import com.testBackendDatabase.demo.model.ShowTime;
 
 
 
-public interface ShowTimeRepository extends JpaRepository<ShowTime,Long> {
+public interface ShowTimeRepository extends JpaRepository<ShowTime,Long>,JpaSpecificationExecutor<ShowTime> {
 
     @Query("SELECT st FROM ShowTime st " +
            "JOIN FETCH st.showRoom sr " +

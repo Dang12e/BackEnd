@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -174,5 +175,18 @@ private final int pageSize=15;
             .title(movieInfo.getTitle()).build()
         ); 
         
+    }
+
+    @Transactional(readOnly = true)
+    public MovieDTO getMostBookedMovie() {
+        return movieInfoRepository.findTopBookedMovie()
+                .map(movieInfo -> MovieDTO.builder()
+                        .id(movieInfo.getId())
+                        .title(movieInfo.getTitle())
+                        .genre(movieInfo.getGenre())
+                        .image(movieInfo.getImage())
+                        .releaseDate(movieInfo.getReleaseDate())
+                        .build())
+                .orElse(null);
     }
 }
