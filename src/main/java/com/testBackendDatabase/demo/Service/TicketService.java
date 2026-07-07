@@ -82,10 +82,11 @@ public class TicketService {
 
     double totalAmount = 0;
     for (Seat seat : seats) {
+        double showtimeprice = showTime.getPrice();
         double price = seat.getBasePrice();
         if ("VIP".equals(seat.getType())) {
             // Logic giá VIP của bạn (có thể nhân hệ số 1.5 như ở code trước)
-            price = price * 1.5; 
+            price = price * 1.5 + showtimeprice;
         }
         totalAmount += price;
     }
@@ -93,6 +94,7 @@ public class TicketService {
 
     List<Ticket> tickets = new ArrayList<>();
     for (Seat seat : seats) {
+        double totalprice = (seat.getType()=="VIP") ? 75000: 50000;
         String ticketCode = UUID.randomUUID().toString();
 
         Ticket ticket = Ticket.builder()
@@ -101,7 +103,7 @@ public class TicketService {
                 .showTime(showTime)
                 .seat(seat)
                 .account(account)
-                .price(seat.getBasePrice()) // hoặc giá sau khi tính VIP
+                .price(totalprice + showTime.getPrice()) // hoặc giá sau khi tính VIP
                 .bookingTime(LocalDateTime.now())
                 .build();
         tickets.add(ticket);

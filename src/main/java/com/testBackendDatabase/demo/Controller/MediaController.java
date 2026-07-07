@@ -88,6 +88,11 @@ public class MediaController {
         List<ShowRoomDTO> showRoomDTOs = addShowRoomService.getAllShowRooms();
         return ResponseEntity.ok(showRoomDTOs);
     }
+    @GetMapping("/getShowRoomsByCinema/{cinemaId}")
+    public ResponseEntity<List<ShowRoomDTO>> getShowRoomsByCinema(@PathVariable Long cinemaId) {
+        List<ShowRoomDTO> showRoomDTOs = addShowRoomService.getShowRoomsByCinema(cinemaId);
+        return ResponseEntity.ok(showRoomDTOs);
+    }
 
 
 }
