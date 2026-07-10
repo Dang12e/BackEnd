@@ -2,6 +2,9 @@ package com.testBackendDatabase.demo.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.testBackendDatabase.demo.DTO.BasicTicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketDTO;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
+@RestControllerAdvice
 @RequestMapping("/api/Ticket")
 public class TicketController {
 
@@ -54,13 +58,20 @@ public class TicketController {
         return ticketService.getTicketsWithPageForUser(page);
     }
 
+    @GetMapping("/getUsersUsedTicketPage")
+    public Page<BasicTicketDTO> getUsersUsedTicketPage(@RequestParam int page) {
+        return ticketService.getUsedTicketsWithPageForUser(page);
+    }
+    
+
     @PostMapping("/validateQR")
     public ResponseEntity<String> validateQR(
             @RequestParam String ticketCode,
             @RequestParam Long showtimeId) {
-        String result = ticketService.validateTicket(ticketCode, showtimeId);
+        String result=ticketService.validateTicket(ticketCode, showtimeId);
         return ResponseEntity.ok(result);
     }
+
     @PostMapping("/checkInTicket")
     public ResponseEntity<String> checkInTicket(@RequestParam String ticketCode) {
         String result = ticketService.checkInTicket(ticketCode);

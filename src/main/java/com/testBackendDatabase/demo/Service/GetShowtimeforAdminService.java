@@ -25,6 +25,8 @@ public class GetShowtimeforAdminService {
                         .movieName(c.getMovie().getTitle())
                         .address(c.getShowRoom().getCinema().getAddress())
                         .startTime(c.getStartTime())
+                        .endTime(c.getEndTime())      // 👈 thêm dòng này
+                        .price(c.getPrice())
                         .build())
                 .collect(Collectors.toList());
     }

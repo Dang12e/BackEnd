@@ -74,11 +74,26 @@ public class AddShowRoomService {
      
 }
 
-    public List<ShowRoomDTO> getAllShowRooms() {
-        // 1. Lấy toàn bộ danh sách phòng từ Repository
-        List<ShowRoom> showRooms = showRoomRepository.findAll();
+    public List<ShowRoomDTO> getShowRoomsByCinema(Long cinemaId) {
+        // 1. Lấy danh sách phòng theo rạp chiếu từ Repository
+        List<ShowRoom> showRooms = showRoomRepository.findByCinema_Id(cinemaId);
 
         // 2. Chuyển đổi từ Entity (ShowRoom) sang DTO (ShowRoomDTO)
+        List<ShowRoomDTO> dtoList = new ArrayList<>();
+        for (ShowRoom room : showRooms) {
+            ShowRoomDTO dto = ShowRoomDTO.builder()
+                    .id(room.getId())
+                    .roomName(room.getRoomName())
+                    .capacity(room.getCapacity())
+                    .build();
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+    @Transactional(readOnly = true)
+    public List<ShowRoomDTO> getAllShowRooms() {
+        List<ShowRoom> showRooms = showRoomRepository.findAll();
+
         List<ShowRoomDTO> dtoList = new ArrayList<>();
         for (ShowRoom room : showRooms) {
             ShowRoomDTO dto = ShowRoomDTO.builder()
