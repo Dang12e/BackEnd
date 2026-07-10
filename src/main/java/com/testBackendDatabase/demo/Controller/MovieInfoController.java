@@ -16,6 +16,7 @@ import com.testBackendDatabase.demo.DTO.MovieDTO;
 import com.testBackendDatabase.demo.DTO.MovieInfoDTO;
 import com.testBackendDatabase.demo.DTO.ShowTimeDTO;
 import com.testBackendDatabase.demo.Request.AddMovieRequest;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.Service.MovieInfoService;
 
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class MovieInfoController {
 
     @PostMapping("/addMovieInfo")
     public ResponseEntity<AddMovieDTO> addMovieInfo(@Valid @RequestPart("data") AddMovieRequest request,@RequestPart("file") MultipartFile image) {
-
+        RoleChecker.CheckRole("ROLE_ADMIN");
         AddMovieDTO movieDTO= movieInfoService.addMovieInfo(request, image);
         return ResponseEntity.ok(movieDTO);
     }

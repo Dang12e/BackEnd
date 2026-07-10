@@ -3,6 +3,7 @@ package com.testBackendDatabase.demo.Controller;
 import com.testBackendDatabase.demo.Repository.ShowTimeRepository;
 import com.testBackendDatabase.demo.Repository.TicketRepository;
 import com.testBackendDatabase.demo.Repository.WalletTransactionRepository;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.DTO.OverViewResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,7 @@ public class OverViewController {
 
     @GetMapping
     public OverViewResponse getOverview() {
+        RoleChecker.CheckRole("ROLE_ADMIN");
 
         Long totalTickets = ticketRepository.count();
 

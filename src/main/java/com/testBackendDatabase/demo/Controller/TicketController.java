@@ -9,6 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.testBackendDatabase.demo.DTO.BasicTicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketDTO;
 import com.testBackendDatabase.demo.DTO.TicketForUserDTO;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.Service.TicketService;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public class TicketController {
     
     @GetMapping("/getTickets")
     public ResponseEntity<List<TicketForUserDTO>> getMethodName() {
-
+        RoleChecker.CheckRole("ROLE_ADMIN");
         List<TicketForUserDTO> ticketForUserDTOs= ticketService.getTickets();
         return ResponseEntity.ok(ticketForUserDTOs);
         
@@ -68,10 +69,11 @@ public class TicketController {
     public ResponseEntity<String> validateQR(
             @RequestParam String ticketCode,
             @RequestParam Long showtimeId) {
+                RoleChecker.CheckRole("ROLE_ADMIN");
         String result=ticketService.validateTicket(ticketCode, showtimeId);
         return ResponseEntity.ok(result);
     }
-
+//KHÔNG DÙNG
     @PostMapping("/checkInTicket")
     public ResponseEntity<String> checkInTicket(@RequestParam String ticketCode) {
         String result = ticketService.checkInTicket(ticketCode);
