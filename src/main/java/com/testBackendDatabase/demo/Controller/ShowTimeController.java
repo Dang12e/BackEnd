@@ -6,6 +6,7 @@ import com.testBackendDatabase.demo.DTO.AddShowTimeDTO;
 import com.testBackendDatabase.demo.DTO.ShowTimeDTO;
 import com.testBackendDatabase.demo.Request.AddShowTimeRequest;
 import com.testBackendDatabase.demo.Request.ShowTimeRequest;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.Service.ShowTimeService;
 
 import java.util.List;
@@ -34,6 +35,7 @@ public ResponseEntity<List<ShowTimeDTO>> getShowTimes(@RequestBody @NonNull Show
 }
     @PostMapping("/addShowTime")
     public ResponseEntity<AddShowTimeDTO> postMethodName(@RequestBody @NonNull AddShowTimeRequest request) {
+        RoleChecker.CheckRole("ROLE_ADMIN");
         AddShowTimeDTO addShowTimeDTO= showTimeService.addShowTime(request);
         return ResponseEntity.ok(addShowTimeDTO);
 

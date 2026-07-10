@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.testBackendDatabase.demo.DTO.WalletTransactionDTO;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.Service.WalletTransactionService;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class WalletTransactionController {
 
     @GetMapping("getHistory")
     public ResponseEntity<List<WalletTransactionDTO>> getMethodName() {
+        RoleChecker.CheckRole("ROLE_ADMIN");
         List<WalletTransactionDTO> walletTransactionDTOs=walletTransactionService.getTransactionHistory();
         return ResponseEntity.ok(walletTransactionDTOs);
     }

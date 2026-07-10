@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.testBackendDatabase.demo.DTO.AccountDTO;
+import com.testBackendDatabase.demo.Security.RoleChecker;
 import com.testBackendDatabase.demo.Service.AccountService;
 
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class AccountController {
     }
     @GetMapping("/all")
     public ResponseEntity<List<AccountDTO>> getAllAccounts() {
-
+        RoleChecker.CheckRole("ROLE_ADMIN");
         return ResponseEntity.ok(accountService.getAllAccounts());
 
     }
