@@ -6,7 +6,7 @@ import com.testBackendDatabase.demo.model.Product;
 import org.springframework.lang.NonNull;
 
 import java.util.List;
-
+//CLASS THU NGHIEM BAN ĐẦU
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
