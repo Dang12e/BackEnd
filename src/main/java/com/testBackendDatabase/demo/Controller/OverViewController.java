@@ -27,7 +27,7 @@ public class OverViewController {
         this.walletTransactionRepository = walletTransactionRepository;
     }
 
-    @GetMapping
+    @GetMapping("/getoverview")
     public OverViewResponse getOverview() {
         RoleChecker.CheckRole("ROLE_ADMIN");
 

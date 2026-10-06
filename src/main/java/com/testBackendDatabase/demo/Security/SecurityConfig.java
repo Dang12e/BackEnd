@@ -30,7 +30,7 @@ public class SecurityConfig {
     {
         http.csrf(csrf->csrf.disable()).authorizeHttpRequests(auth->auth.requestMatchers("/api/auth/*","/api/feature/*")
         .permitAll().requestMatchers("/api/payment/vnpay-callback").permitAll().requestMatchers("/ws-payment/**").permitAll()
-        .requestMatchers("/error").permitAll().anyRequest().authenticated()
+        .requestMatchers("/error").permitAll().requestMatchers("/api/Overview/getoverview").permitAll().anyRequest().authenticated()
         );
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
